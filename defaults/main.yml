@@ -17,7 +17,7 @@ exim4_updateexim4confconf_template: update-exim4.conf.conf.j2
 # These 4 settings are not available through debconf but are required in
 # update-exim4.conf.conf
 exim4_conf_CFILEMODE: '644'
-exim4_conf_dc_use_split_config: 'true'
+exim4_conf_dc_use_split_config: true
 exim4_conf_dc_hide_mailname: ''
 exim4_conf_dc_mailname_in_oh: 'true'
 #

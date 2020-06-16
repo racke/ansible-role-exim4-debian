@@ -50,7 +50,7 @@
   notify:
     - Update Exim4 conf
     - Restart Exim4
-  when: exim4_conf_dc_use_split_config == 'true'
+  when: exim4_conf_dc_use_split_config
 
 - name: Exim4 | Copy single-file conf
   template:
@@ -62,7 +62,7 @@
   notify:
     - Update Exim4 conf
     - Restart Exim4
-  when: exim4_conf_dc_use_split_config == 'false'
+  when: not exim4_conf_dc_use_split_config
 
 - name: Exim4 | Create other files
   copy:
