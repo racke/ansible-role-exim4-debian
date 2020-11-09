@@ -44,9 +44,9 @@ exim4_debconf:
   # - { question: exim4/dc_minimaldns,
   #   value: 'false',
   #   vtype: boolean }
-  # - { question: exim4/dc_other_hostnames,
-  #   value: '',
-  #   vtype: string }
+  - { question: exim4/dc_other_hostnames,
+     value: "{{ exim4_conf_dc_other_hostnames | default ([]) | join(';') }}",
+     vtype: string }
   # - { question: exim4/dc_postmaster,
   #   value: '',
   #   vtype: string }
