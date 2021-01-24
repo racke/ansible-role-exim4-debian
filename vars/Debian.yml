@@ -1,0 +1,3 @@
+---
+exim4_os_package_name: exim4-daemon-heavy
+exim4_service: exim4

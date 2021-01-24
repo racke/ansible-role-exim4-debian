@@ -6,12 +6,7 @@ exim4_aliases: []
 #   root: "sysadmins@example.com"
 #   postmaster: "mailadmins@example.com"
 
-exim4_package_name:
-  - exim4-daemon-heavy
-  # - exim4-daemon-light
-  - spf-tools-perl
-  - swaks
-
+exim4_service: exim
 exim4_updateexim4confconf_template: update-exim4.conf.conf.j2
 
 # These 4 settings are not available through debconf but are required in

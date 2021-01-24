@@ -1,4 +1,7 @@
 ---
+- name: Exim4 | Include variables depending on OS details
+  include_vars: "{{ ansible_os_family }}.yml"
+
 - name: Exim4 | Set mailname
   lineinfile:
     dest: /etc/mailname
@@ -84,6 +87,6 @@
 
 - name: Exim4 | Enable at boot
   service:
-    name: exim4
+    name: "{{ exim4_service }}"
     enabled: yes
     state: started
