@@ -19,8 +19,8 @@
   notify: Newaliases
 
 - name: Exim4 | Install package
-  apt:
-    name: "{{ exim4_package_name }}"
+  package:
+    name: "{{ exim4_package_name | default(exim4_os_package_name) }}"
     state: present
 
 - name: Exim4 | Configure debconf for exim4-config
