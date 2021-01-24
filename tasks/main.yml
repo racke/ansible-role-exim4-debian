@@ -30,6 +30,7 @@
     value: '{{ item.value }}'
     vtype: '{{ item.vtype }}'
   loop: '{{ exim4_debconf }}'
+  when: ansible_os_family == 'Debian'
   notify:
     - Update Exim4 conf
     - Restart Exim4
@@ -38,6 +39,7 @@
   template:
     src: "{{ exim4_updateexim4confconf_template }}"
     dest: /etc/exim4/update-exim4.conf.conf
+  when: ansible_os_family == 'Debian'
   notify:
     - Update Exim4 conf
     - Restart Exim4
@@ -53,7 +55,9 @@
   notify:
     - Update Exim4 conf
     - Restart Exim4
-  when: exim4_conf_dc_use_split_config == 'true'
+  when:
+    - ansible_os_family == 'Debian'
+    - exim4_conf_dc_use_split_config == 'true'
 
 - name: Exim4 | Copy single-file conf
   template:
@@ -65,7 +69,10 @@
   notify:
     - Update Exim4 conf
     - Restart Exim4
-  when: exim4_conf_dc_use_split_config == 'false'
+  when:
+    - ansible_os_family == 'Debian'
+    - exim4_conf_dc_use_split_config == 'false'
+
 
 - name: Exim4 | Create other files
   copy:
