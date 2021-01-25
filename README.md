@@ -3,6 +3,10 @@
 Installs and configures [Exim](https://www.exim.org/) on Alpine, Archlinux, CentOS, Debian, FreeBSD,
 Redhat, Suse and Ubuntu servers.
 
+# Requirements
+
+None.
+
 Role Variables
 --------------
 
