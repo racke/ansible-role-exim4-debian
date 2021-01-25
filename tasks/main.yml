@@ -86,10 +86,15 @@
     - Update Exim4 conf
     - Restart Exim4
 
+- name: Exim4 | Ensure that logrotate is installed
+  package:
+    name: logrotate
+    state: present
+
 - name: Exim4 | Configure logs rotation
   template:
     src: "{{ item.value.template|default('logrotate.j2') }}"
-    dest: "/etc/logrotate.d/{{ item.key }}"
+    dest: "{{ exim4_logrotate_conf_directory }}/{{ item.key }}"
   with_dict: "{{ exim4_logrotate }}"
 
 - name: Exim4 | Enable at boot

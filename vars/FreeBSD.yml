@@ -1,2 +1,3 @@
 ---
 exim4_os_package_name: exim
+exim4_logrotate_conf_directory: /usr/local/etc/logrotate.d

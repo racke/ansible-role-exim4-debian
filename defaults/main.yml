@@ -98,6 +98,8 @@ exim4_other_conf_files: []
 #     content: |
 #       MESSAGE_SIZE_LIMIT=100m
 
+exim4_logrotate_conf_directory: /etc/logrotate.d
+
 exim4_logrotate:
   exim4-base:
     # template: "logrotate.j2"
