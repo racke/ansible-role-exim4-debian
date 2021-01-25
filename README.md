@@ -1,7 +1,7 @@
-Exim4-Debian
-============
+# Ansible Role: Exim
 
-An Ansible Role to install and configure [Exim](https://www.exim.org/) for Debian.
+Installs and configures [Exim](https://www.exim.org/) on Alpine, Archlinux, CentOS, Debian, FreeBSD,
+Redhat, Suse and Ubuntu servers.
 
 Role Variables
 --------------
