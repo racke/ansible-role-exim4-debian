@@ -1,0 +1,24 @@
+---
+- name: Exim4 | Copy TLS key file
+  copy:
+    src: "{{ exim4_tls_key_file }}"
+    dest: /etc/exim4/exim.key
+    remote_src: yes
+    owner: root
+    group: Debian-exim
+    mode: '0640'
+  notify:
+    - Restart Exim4
+  when: exim4_tls_key_file is defined
+
+- name: Exim4 | Copy TLS certificate file
+  copy:
+    src: "{{ exim4_tls_cert_file }}"
+    dest: /etc/exim4/exim.crt
+    remote_src: yes
+    owner: root
+    group: Debian-exim
+    mode: '0644'
+  notify:
+    - Restart Exim4
+  when: exim4_tls_cert_file is defined
