@@ -7,13 +7,15 @@
     line: "{{ exim4_mailname }}"
 
 - name: Exim4 | Set local aliases
-  lineinfile:
+  copy:
     dest: /etc/aliases
-    create: yes
-    regexp: "^{{ item.key }}:"
-    line: "{{ item.key }}: {{ item.value }}"
-  with_dict: "{{ exim4_aliases }}"
+    content: |
+      # /etc/aliases
+      {% for alias in exim4_aliases | dict2items %}
+      {{ alias.key }}: {{ alias.value }}
+      {% endfor %}
   notify: Newaliases
+  tags: exim-aliases
 
 - name: Exim4 | Install package
   apt:
