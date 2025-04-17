@@ -1,0 +1,6 @@
+{% if exim4_tls_enabled %}
+tls_require_ciphers = {{ exim4_tls_require_ciphers }}
+{% if exim_extra_ports | rejectattr('tls_on_connect', 'undefined') | selectattr('tls_on_connect', 'equalto', True) | list | count %}
+tls_on_connect_ports = {{ exim_extra_ports | rejectattr('tls_on_connect', 'undefined') | selectattr('tls_on_connect', 'equalto', True) | map(attribute='port') | list | join(':') }}
+{% endif %}
+{% endif %}

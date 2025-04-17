@@ -68,6 +68,21 @@
     - Restart Exim4
   when: exim4_conf_dc_use_split_config == 'false'
 
+- name: Exim4 | TLS configuration file
+  template:
+    src: tls.j2
+    dest: '/etc/exim4/conf.d/main/00_local_tls'
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - Update Exim4 conf
+    - Restart Exim4
+  tags:
+    - exim
+    - exim-ports
+    - exim-tls
+
 - name: Exim4 | Create other files
   copy:
     content: "{{ item.content }}"

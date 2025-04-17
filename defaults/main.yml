@@ -14,6 +14,10 @@ exim4_package_name:
 
 exim4_updateexim4confconf_template: update-exim4.conf.conf.j2
 
+exim4_tls_enabled: true
+exim4_tls_require_ciphers: |
+  SECURE128:-RSA:-VERS-ALL:!SHA1:!SHA256:!SHA384:+VERS-TLS1.2:+VERS-TLS1.3:%SERVER_PRECEDENCE
+
 # These 4 settings are not available through debconf but are required in
 # update-exim4.conf.conf
 exim4_conf_CFILEMODE: '644'
