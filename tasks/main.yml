@@ -68,6 +68,26 @@
     - Restart Exim4
   when: exim4_conf_dc_use_split_config == 'false'
 
+- name: Configure additional ports for Exim
+  lineinfile:
+    dest: /etc/default/exim4
+    line: |-
+      SMTPLISTENEROPTIONS='-oX {{ exim4_main_port }}{% if exim4_extra_ports | count > 0 %}:{{ exim4_extra_ports | map(attribute='port') | list | join(":") }}{% endif %} -oP /run/exim4/exim.pid'
+    regexp: '^SMTPLISTENEROPTIONS='
+  notify:
+    - Restart Exim4
+
+- name: Add local macros to Exim configuration
+  template:
+    src: local_macros.j2
+    dest: '/etc/exim4/conf.d/main/00_local_macros'
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - Update Exim4 conf
+    - Restart Exim4
+
 - name: Exim4 | TLS configuration file
   template:
     src: tls.j2
@@ -78,10 +98,6 @@
   notify:
     - Update Exim4 conf
     - Restart Exim4
-  tags:
-    - exim
-    - exim-ports
-    - exim-tls
 
 - name: Exim4 | Create other files
   copy:
