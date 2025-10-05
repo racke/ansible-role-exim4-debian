@@ -1,7 +1,7 @@
 ---
 
 exim4_mailname: "{{ ansible_fqdn }}"
-exim4_aliases: []
+exim4_aliases: {}
 # exim4_aliases:
 #   root: "sysadmins@example.com"
 #   postmaster: "mailadmins@example.com"
