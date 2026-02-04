@@ -1,6 +1,6 @@
 CHECK_RCPT_VERIFY_SENDER = true
 {% if exim4_tls_enabled %}
-MAIN_TLS_ENABLE = yes
+MAIN_TLS_ENABLE = true
 {% endif %}
 {% if exim4_log_selector is defined %}
 MAIN_LOG_SELECTOR = +tls_peerdn {{ exim_log_selector }}
