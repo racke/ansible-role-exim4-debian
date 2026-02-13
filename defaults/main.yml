@@ -25,6 +25,9 @@ exim4_extra_ports:
 
 exim4_log_subject: false
 
+# Extra macros
+exim4_extra_macros: []
+
 # These 4 settings are not available through debconf but are required in
 # update-exim4.conf.conf
 exim4_conf_CFILEMODE: '644'

@@ -69,6 +69,13 @@ exim4_aliases:
   root: "sysadmins@example.com"
   postmaster: "mailadmins@example.com"
 ```
+- `exim4_extra_macros`: custom macros (macro name automatically uppercased)
+
+```yaml
+exim4_extra_macros:
+  - macro: "main_hardcode_primary_hostname"
+    value: "{{ inventory_hostname }}"
+```
 
 Example Playbook
 ----------------

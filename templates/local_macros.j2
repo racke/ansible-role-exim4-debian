@@ -7,3 +7,6 @@ MAIN_LOG_SELECTOR = +tls_peerdn {{ exim_log_selector }}
 {% elif exim4_log_subject is sameas true %}
 MAIN_LOG_SELECTOR = +tls_peerdn +subject
 {% endif %}
+{% for macro in exim4_extra_macros %}
+{{ macro.macro | upper }} = {{ macro.value }}
+{% endfor %}
