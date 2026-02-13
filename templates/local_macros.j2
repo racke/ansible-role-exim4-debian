@@ -3,9 +3,7 @@ CHECK_RCPT_VERIFY_SENDER = true
 MAIN_TLS_ENABLE = true
 {% endif %}
 {% if exim4_log_selector is defined %}
-MAIN_LOG_SELECTOR = +tls_peerdn {{ exim_log_selector }}
-{% elif exim4_log_subject is sameas true %}
-MAIN_LOG_SELECTOR = +tls_peerdn +subject
+MAIN_LOG_SELECTOR = {{ exim4_log_selector }}
 {% endif %}
 {% for macro in exim4_extra_macros %}
 {{ macro.macro | upper }} = {{ macro.value }}

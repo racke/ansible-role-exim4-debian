@@ -23,8 +23,6 @@ exim4_extra_ports:
   - port: 465
     tls_on_connect: yes
 
-exim4_log_subject: false
-
 # Extra macros
 exim4_extra_macros: []
 
