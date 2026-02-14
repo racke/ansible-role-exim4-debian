@@ -1,4 +1,6 @@
-CHECK_RCPT_VERIFY_SENDER = true
+{% if  exim4_check_rcpt_verify_sender is sameas true %}
+CHECK_RCPT_VERIFY_SENDER = {{ exim4_check_rcpt_verify_sender | lower }}
+{% endif %}
 {% if exim4_tls_enabled %}
 MAIN_TLS_ENABLE = true
 {% endif %}
