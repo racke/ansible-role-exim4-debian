@@ -99,6 +99,11 @@
     - Update Exim4 conf
     - Restart Exim4
 
+- name: Exim4 | DKIM Setup
+  import_tasks: dkim.yml
+  when: exim4_dkim_enable is sameas true
+  tags: exim4-dkim
+
 - name: Exim4 | Create other files
   copy:
     content: "{{ item.content }}"
