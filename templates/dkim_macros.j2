@@ -1,0 +1,11 @@
+DKIM_CANON = relaxed
+DKIM_SELECTOR = {{ exim4_dkim_selector }}
+
+# Get the domain from the outgoing mail.
+DKIM_DOMAIN = ${lookup{${lc:${domain_data:$h_from:}}} lsearch{/etc/exim4/{{ exim4_dkim_domain_file }}}}
+
+# The file is based on the outgoing domain-name in the from-header.
+DKIM_FILE = {{ exim4_dkim_key_directory }}/live/DKIM_DOMAIN-private.pem
+
+# If key exists then use it, if not don't.
+DKIM_PRIVATE_KEY = ${if exists{DKIM_FILE}{DKIM_FILE}{0}}

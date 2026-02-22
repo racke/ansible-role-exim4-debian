@@ -1,0 +1,4 @@
+# DKIM domains
+{% for domain in exim4_dkim_domains | dict2items %}
+{{ domain.key }}:{{ domain.key }}
+{% endfor %}

@@ -1,0 +1,122 @@
+---
+# Copyright (C) 2021-2026 Stefan Hornburg (Racke) <racke@linuxia.de>
+# SPDX-License-Identifier: Artistic-2.0
+
+- name: Check for DKIM selector
+  ansible.builtin.assert:
+    that:
+      - exim4_dkim_selector is string
+      - exim4_dkim_selector | length > 0
+
+- name: Create DKIM key directory
+  ansible.builtin.file:
+    state: directory
+    path: "{{ item }}"
+    owner: Debian-exim
+    group: Debian-exim
+    mode: '0750'
+  loop:
+    - "{{ exim4_dkim_key_directory }}"
+    - "{{ exim4_dkim_key_directory }}/live"
+    - "{{ exim4_dkim_key_directory }}/attic"
+
+- name: Create file for DKIM domains
+  ansible.builtin.template:
+    src: 'dkim-domains.j2'
+    dest: "/etc/exim4/{{ exim4_dkim_domain_file }}"
+    owner: root
+    group: root
+    mode: '0644'
+    
+- name: Add DKIM settings
+  ansible.builtin.template:
+    src: "dkim_macros.j2"
+    dest: "/etc/exim4/conf.d/main/{{ exim4_dkim_macro_file }}"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Update Exim4 conf
+
+- name: Check whether DKIM DNS entry exists
+  ansible.builtin.debug:
+    msg: "{{lookup('community.general.dnstxt', exim4_dkim_selector | string + '._domainkey.' + item.key) }}"
+  loop: "{{ exim4_dkim_domains | dict2items }}"
+  register: exim4_dkim_dnstxt
+  tags: dnstxt
+
+- name: Set DKIM DNS info
+  ansible.builtin.set_fact:
+    exim4_dkim_dnstxt_info: "{{ exim4_dkim_dnstxt_info | default({}) | combine ({ item.item.key : { exim4_dkim_selector : item.msg }}, recursive=True) }}"
+  loop: "{{ exim4_dkim_dnstxt.results }}"
+  tags: dnstxt
+
+- name: Check whether private key exists in live directory 
+  stat:
+    path: "{{ exim4_dkim_key_directory }}/live//dkim-{{ item.key }}-{{ exim4_dkim_selector }}.pem"
+  loop: "{{ exim4_dkim_domains | dict2items }}"
+  register: exim4_dkim_stat_live_keys
+
+- name: Create dict of live private keys 
+  set_fact:
+    cert_exists:  "{{ cert_exists | default({}) | combine( { (exim4_dkim_domains | dict2items)[item.0].key : item.1.stat } ) }}"
+  with_indexed_items:
+    - "{{ exim4_dkim_stat_live_keys.results }}"
+
+
+- name: Ensure that DKIM private key exists in attic directory
+  community.crypto.openssl_privatekey:
+    path: "{{ exim4_dkim_key_directory }}/attic/dkim-{{ item.key }}-{{ exim4_dkim_selector }}.pem"
+    size: "{{ exim4_dkim_key_size | default(2048) }}"
+    owner: "Debian-exim"
+    group: "Debian-exim"
+    mode: '0600'
+  loop: "{{ cert_exists |  dict2items }}"
+  when: item.value.exists is sameas false
+  ignore_errors: "{{ ansible_check_mode }}"
+  no_log: true  # make sure that private key data is not accidentally revealed in logs!
+
+- name: Get public key
+  community.crypto.openssl_privatekey_info:
+    path: "{{ exim4_dkim_key_directory }}/attic/dkim-{{ item.key }}-{{ exim4_dkim_selector }}.pem"
+  loop: "{{ cert_exists |  dict2items  }}"
+  register: exim_dkim_key_info
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Assemble DNS records
+  ansible.builtin.debug:
+    msg: "v=DKIM1; p={{ item.public_key | regex_replace('([-]+)(BEGIN|END) PUBLIC KEY([-]+)', '') | regex_replace('\\s', '') }}"
+  loop: "{{ exim_dkim_key_info.results }}"
+  when: exim_dkim_key_info is success
+  no_log: true
+
+- name: Determine expected DNS record with existing ones
+  ansible.builtin.set_fact:
+    exim_dkim_dnstxt_expected: "{{ exim_dkim_dnstxt_expected | default({}) | combine ({ item.item.key : {   exim4_dkim_selector : 'v=DKIM1; ' + exim_dkim_record_supplement + 'p=' +(item.public_key | regex_replace('([-]+)(BEGIN|END) PUBLIC KEY([-]+)', '') | regex_replace('\\s', ''))} }, recursive=True) }}"
+  loop: "{{ exim_dkim_key_info.results }}"
+  when: exim_dkim_key_info is success
+  no_log: "{{ exim4_dkim_log_debug }}"
+
+- name: Show expected DNS record
+  debug:
+    var: exim_dkim_dnstxt_expected
+  when: exim_dkim_key_info is success
+
+- name: Show actual DNS record
+  debug:
+    var: exim4_dkim_dnstxt_info
+
+# Now we find out which are ready to go
+- name: Install private key
+  ansible.builtin.copy:
+    src: "{{ exim4_dkim_key_directory }}/attic/dkim-{{ item.item.key }}-{{ exim4_dkim_selector }}.pem"
+    dest: "{{ exim4_dkim_key_directory }}/live/{{ item.item.key }}-private.pem"
+    remote_src: yes
+    owner: Debian-exim
+    group: Debian-exim
+    mode: '0640'
+  when:
+    - exim_dkim_key_info is success
+    - exim4_dkim_dnstxt_info[item.item.key][exim4_dkim_selector] != 'NXDOMAIN'
+#    - exim4_dkim_dnstxt_info[item.item.key][exim4_dkim_selector] == exim_dkim_dnstxt_expected[item.item.key][exim4_dkim_selector]
+  loop: "{{ exim_dkim_key_info.results }}"
+  register: exim_dkim_copy_info
